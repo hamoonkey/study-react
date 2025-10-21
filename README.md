@@ -6,7 +6,7 @@
   - [x] どれを使っている？
     - "react-router-dom": "^7.2.0"
   - [ ] 使い方
-    - [ ] Declarative mode
+    - [x] Declarative mode
     - [ ] Data mode
     - [ ] Framework mode
 - [ ] Store
