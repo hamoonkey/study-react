@@ -38,7 +38,7 @@ function Navigation() {
           <NavLink to="/register" end>Register</NavLink>
         </li>
         <li>
-          <NavLink to="/concerts" end>ConcertsHome</NavLink>
+          <NavLink to="/concerts">ConcertsHome</NavLink>
         </li>
         <li>
           <NavLink to="/concerts/trending" end>Trending</NavLink>
