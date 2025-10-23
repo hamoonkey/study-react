@@ -1,3 +1,5 @@
+# Reactを学ぶ
+
 ## 計画
 
 - [ ] Routing
@@ -7,7 +9,7 @@
     - "react-router-dom": "^7.2.0"
   - [ ] 使い方
     - [x] Declarative mode
-    - [ ] Data mode
+    - [x] Data mode
     - [ ] Framework mode
 - [ ] Store
   - [ ] なにがある？
@@ -21,3 +23,4 @@
 ## その他
 
 - PWA2と合わせるため、`nvm use 22`
+- Framework modeは使っていないので、後回し
