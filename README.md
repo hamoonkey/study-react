@@ -2,18 +2,21 @@
 
 ## 計画
 
-- [ ] Routing
+- [x] Routing
   - [x] なにがある？
     - React Router一択
   - [x] どれを使っている？
     - "react-router-dom": "^7.2.0"
-  - [ ] 使い方
+  - [x] 使い方
     - [x] Declarative mode
     - [x] Data mode
-    - [ ] Framework mode
 - [ ] Store
-  - [ ] なにがある？
-  - [ ] どれを使っている？
+  - [x] なにがある？
+    - Redux
+    - Zustand
+    - Jotai
+  - [x] どれを使っている？
+    - "@reduxjs/toolkit": "^2.6.0"
   - [ ] 使い方
 - [ ] Style
   - [ ] どれを使っている？

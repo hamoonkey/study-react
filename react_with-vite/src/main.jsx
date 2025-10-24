@@ -3,6 +3,7 @@ import { createRoot } from "react-dom/client";
 import { Outlet, NavLink, createBrowserRouter, RouterProvider } from "react-router";
 
 import Home from "./pages/Home.jsx";
+import App from "./pages/App/App.jsx";
 import About from "./pages/About.jsx";
 import AuthLayout from "./pages/Auth/AuthLayout.jsx";
 import Login from "./pages/Auth/Login.jsx";
@@ -27,6 +28,9 @@ function Navigation() {
       <ul>
         <li>
           <NavLink to="/" end>Home</NavLink>
+        </li>
+        <li>
+          <NavLink to="/app" end>App</NavLink>
         </li>
         <li>
           <NavLink to="/about" end>About</NavLink>
@@ -55,6 +59,10 @@ const router = createBrowserRouter([
       {
         index: true,
         element: <Home></Home>
+      },
+      {
+        path: "app",
+        element: <App></App>
       },
       {
         path: "about",
