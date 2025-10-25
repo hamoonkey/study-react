@@ -18,6 +18,8 @@
   - [x] どれを使っている？
     - "@reduxjs/toolkit": "^2.6.0"
   - [ ] 使い方
+    - [ ] Redux
+    - [ ] Redux-React
 - [ ] Style
   - [ ] どれを使っている？
     - Tailwind
