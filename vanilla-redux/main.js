@@ -1,5 +1,5 @@
 /** Setup Store */
-import { legacy_createStore } from "https://cdn.jsdelivr.net/npm/redux@5.0.1/dist/redux.legacy-esm.min.js";
+import { combineReducers, legacy_createStore } from "https://cdn.jsdelivr.net/npm/redux@5.0.1/dist/redux.browser.mjs";
 
 // Reducer
 function counterReducer(state = { count: 0 }, action) {
@@ -31,18 +31,12 @@ function postsReducer(state = [], action) {
   }
 }
 
-// combineReducersを使わずに手動で統合
-function rootReducer(state = {
-    counter: { count: 0 },
-    user: { name: '' },
-    posts: []
-}, action) {
-  return {
-    counter: counterReducer(state.counter, action),
-    user: userReducer(state.user, action),
-    posts: postsReducer(state.posts, action),
-  };
-}
+// combineReducersを使って統合
+const rootReducer = combineReducers({
+    counter: counterReducer,
+    user: userReducer,
+    posts: postsReducer
+});
 
 // Storeの作成
 const store = legacy_createStore(rootReducer);
