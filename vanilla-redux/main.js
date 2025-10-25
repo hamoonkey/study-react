@@ -39,7 +39,7 @@ const rootReducer = combineReducers({
 });
 
 // Storeの作成
-const store = legacy_createStore(rootReducer);
+const store = legacy_createStore(rootReducer, window.__REDUX_DEVTOOLS_EXTENSION__ && window.__REDUX_DEVTOOLS_EXTENSION__());
 
 /** User Operations */
 document.getElementById("counter-increment").addEventListener("click", () => {
