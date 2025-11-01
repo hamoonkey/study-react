@@ -1,6 +1,8 @@
 /** Setup Store */
 import { combineReducers, legacy_createStore, applyMiddleware } from "https://cdn.jsdelivr.net/npm/redux@5.0.1/dist/redux.browser.mjs";
 
+import { createLogger } from "https://cdnjs.cloudflare.com/ajax/libs/redux-logger/4.0.0/redux-logger.es.min.js";
+
 // Reducer
 function counterReducer(state = { count: 0 }, action) {
   switch (action.type) {
@@ -39,12 +41,7 @@ const rootReducer = combineReducers({
 });
 
 // Middleware
-const loggerMiddleware = store => next => action => {
-  console.log('Before:', store.getState(), action);
-  const result = next(action);
-  console.log('After:', store.getState(), action, result);
-  return result;
-}
+const loggerMiddleware = createLogger();
 
 // Storeの作成
 const store = legacy_createStore(rootReducer, applyMiddleware(loggerMiddleware));
