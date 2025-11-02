@@ -1,7 +1,7 @@
 /** Setup Store */
 import { combineReducers, legacy_createStore } from "https://cdn.jsdelivr.net/npm/redux@5.0.1/dist/redux.browser.mjs";
 
-// Reducer
+// Reducer and Action Creator
 function counterReducer(state = { count: 0 }, action) {
   switch (action.type) {
     case 'INCREMENT':
@@ -12,6 +12,12 @@ function counterReducer(state = { count: 0 }, action) {
       return state;
   }
 }
+function increment() {
+  return { type: 'INCREMENT' };
+}
+function decrement() {
+  return { type: 'DECREMENT' };
+}
 
 function userReducer(state = { name: '' }, action) {
   switch (action.type) {
@@ -21,6 +27,9 @@ function userReducer(state = { name: '' }, action) {
       return state;
   }
 }
+function setUser(name) {
+  return { type: 'SET_USER', payload: name };
+}
 
 function postsReducer(state = [], action) {
   switch (action.type) {
@@ -29,6 +38,9 @@ function postsReducer(state = [], action) {
     default:
       return state;
   }
+}
+function addPost(message) {
+  return { type: 'ADD_POST', payload: message };
 }
 
 // combineReducersを使って統合
@@ -71,7 +83,7 @@ document.getElementById("counter-increment").addEventListener("click", () => {
     body: JSON.stringify({ value: newCounter })
   }).then(response => {
     if (response.ok) {
-      store.dispatch({ type: 'INCREMENT' });
+      store.dispatch(increment());
     }
   });
 });
@@ -86,7 +98,7 @@ document.getElementById("counter-decrement").addEventListener("click", () => {
     body: JSON.stringify({ value: newCounter })
   }).then(response => {
     if (response.ok) {
-      store.dispatch({ type: 'DECREMENT' });
+      store.dispatch(decrement());
     }
   });
 });
@@ -101,7 +113,7 @@ document.getElementById("user-set").addEventListener("click", () => {
     body: JSON.stringify({ name: $userInput.value })
   }).then(response => {
     if (response.ok) {
-      store.dispatch({ type: 'SET_USER', payload: $userInput.value });
+      store.dispatch(setUser($userInput.value));
       $userInput.value = '';
     }
   });
@@ -117,7 +129,7 @@ document.getElementById("post-add").addEventListener("click", () => {
     body: JSON.stringify({ message: $postInput.value })
   }).then(response => {
       if (response.ok) {
-        store.dispatch({ type: 'ADD_POST', payload: $postInput.value });
+        store.dispatch(addPost($postInput.value));
         $postInput.value = '';
       }
   });
