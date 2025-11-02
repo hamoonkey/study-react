@@ -1,5 +1,6 @@
 /** Setup Store */
 import { combineReducers, legacy_createStore, applyMiddleware } from "https://cdn.jsdelivr.net/npm/redux@5.0.1/dist/redux.browser.mjs";
+import { thunk } from "https://cdnjs.cloudflare.com/ajax/libs/redux-thunk/3.1.0/redux-thunk.legacy-esm.min.js";
 
 // Reducer and Action Creator
 function counterReducer(state = { count: 0 }, action) {
@@ -112,14 +113,6 @@ const rootReducer = combineReducers({
     posts: postsReducer
 });
 
-// Middleware
-const thunkMiddleware = store => next => action => {
-  if (typeof action === 'function') {
-    return action();
-  }
-  return next(action);
-};
-
 // Storeの作成
 let store;
 const initialState = [];
@@ -131,7 +124,7 @@ Promise.all(initialState).then(responses => Promise.all(responses.map(res => res
     counter: {count: count.value},
     user: { name: user.name },
     posts: posts.map(post => post.message)
-  }, applyMiddleware(thunkMiddleware));
+  }, applyMiddleware(thunk));
 
   updateView();
 
