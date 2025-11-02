@@ -43,23 +43,65 @@ const store = legacy_createStore(rootReducer);
 
 /** User Operations */
 document.getElementById("counter-increment").addEventListener("click", () => {
-  store.dispatch({ type: 'INCREMENT' });
+  const newCounter = store.getState().counter.count + 1;
+  fetch('http://localhost:3000/count', {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({ value: newCounter })
+  }).then(response => {
+    if (response.ok) {
+      store.dispatch({ type: 'INCREMENT' });
+    }
+  });
 });
 
 document.getElementById("counter-decrement").addEventListener("click", () => {
-  store.dispatch({ type: 'DECREMENT' });
+  const newCounter = store.getState().counter.count - 1;
+  fetch('http://localhost:3000/count', {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({ value: newCounter })
+  }).then(response => {
+    if (response.ok) {
+      store.dispatch({ type: 'DECREMENT' });
+    }
+  });
 });
 
 document.getElementById("user-set").addEventListener("click", () => {
   const $userInput = document.getElementById("user-input");
-  store.dispatch({ type: 'SET_USER', payload: $userInput.value });
-  $userInput.value = '';
+  fetch('http://localhost:3000/user', {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({ name: $userInput.value })
+  }).then(response => {
+    if (response.ok) {
+      store.dispatch({ type: 'SET_USER', payload: $userInput.value });
+      $userInput.value = '';
+    }
+  });
 });
 
 document.getElementById("post-add").addEventListener("click", () => {
   const $postInput = document.getElementById("post-input");
-  store.dispatch({ type: 'ADD_POST', payload: $postInput.value });
-  $postInput.value = '';
+  fetch('http://localhost:3000/posts', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({ message: $postInput.value })
+  }).then(response => {
+      if (response.ok) {
+        store.dispatch({ type: 'ADD_POST', payload: $postInput.value });
+        $postInput.value = '';
+      }
+  });
 });
 
 /** Init */

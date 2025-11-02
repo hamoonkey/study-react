@@ -2,6 +2,8 @@
 
 ## 計画
 
+- [ ] React
+  - [ ] Hook
 - [x] Routing
   - [x] なにがある？
     - React Router一択
@@ -18,12 +20,14 @@
   - [x] どれを使っている？
     - "@reduxjs/toolkit": "^2.6.0"
   - [ ] 使い方
-    - [ ] Redux
+    - [ ] Redux Core
+    - [ ] Redux Toolkit
     - [ ] Redux-React
 - [ ] Style
   - [ ] どれを使っている？
     - Tailwind
     - Styled-Components
+- [ ] i18n
 
 ## その他
 
