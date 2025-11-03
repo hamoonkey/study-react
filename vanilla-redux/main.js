@@ -2,17 +2,6 @@
 import {createSlice, configureStore, createAsyncThunk} from "https://cdn.jsdelivr.net/npm/@reduxjs/toolkit@2.9.2/+esm";
 
 // Slice and ThunkActionCreator
-const counterSlice = createSlice({
-  name: 'counter',
-  initialState: { count: 0 },
-  reducers: {
-    increment: (state) => { 
-      state.count += 1;
-    },
-    decrement: (state) => { state.count -= 1 }
-  }
-});
-
 const asyncIncrement = createAsyncThunk(
   'counter/asyncIncrement',
   async (_, thunkAPI) => {
@@ -25,7 +14,7 @@ const asyncIncrement = createAsyncThunk(
       body: JSON.stringify({ value: newCounter })
     });
     if (response.ok) {
-      thunkAPI.dispatch(counterSlice.actions.increment());
+      return null;
     }
   }
 );
@@ -42,7 +31,39 @@ const asyncDecrement = createAsyncThunk(
       body: JSON.stringify({ value: newCounter })
     });
     if (response.ok) {
-      thunkAPI.dispatch(counterSlice.actions.decrement());
+      return null;
+    }
+  }
+);
+
+const counterSlice = createSlice({
+  name: 'counter',
+  initialState: { count: 0 },
+  reducers: {
+    increment: (state) => { 
+      state.count += 1;
+    },
+    decrement: (state) => { state.count -= 1 }
+  },
+  extraReducers: (builder) => {
+    builder.addCase(asyncIncrement.fulfilled, (state, action) => {
+      state.count += 1;
+    });
+  }
+});
+
+const asyncSetUser = createAsyncThunk(
+  'user/asyncSetUser',  
+  async (name) => {
+    const response = await fetch('http://localhost:3000/user', {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ name: name })
+    });
+    if (response.ok) {
+      return name;
     }
   }
 );
@@ -52,21 +73,26 @@ const userSlice = createSlice({
   initialState: { name: '' },
   reducers: {
     setUser: (state, action) => { state.name = action.payload }
+  },
+  extraReducers: (builder) => {
+    builder.addCase(asyncSetUser.fulfilled, (state, action) => {
+      state.name = action.payload;
+    });
   }
 });
 
-const asyncSetUser = createAsyncThunk(
-  'user/asyncSetUser',  
-  async (name, thunkAPI) => {
-    const response = await fetch('http://localhost:3000/user', {
-      method: 'PUT',
+const asyncAddPost = createAsyncThunk(
+  'posts/asyncAddPost',
+  async (message) => {
+    const response = await fetch('http://localhost:3000/posts', {
+      method: 'POST',
       headers: {
         'Content-Type': 'application/json'
       },
-      body: JSON.stringify({ name: name })
+      body: JSON.stringify({ message: message })
     });
     if (response.ok) {
-      thunkAPI.dispatch(userSlice.actions.setUser(name));
+      return message;
     }
   }
 );
@@ -76,24 +102,13 @@ const postsSlice = createSlice({
   initialState: [],
   reducers: {
     addPost: (state, action) => { state.push(action.payload) }
+  },
+  extraReducers: (builder) => {
+    builder.addCase(asyncAddPost.fulfilled, (state, action) => {
+      state.push(action.payload);
+    });
   }
 });
-
-const asyncAddPost = createAsyncThunk(
-  'posts/asyncAddPost',
-  async (message, thunkAPI) => {
-    const response = await fetch('http://localhost:3000/posts', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({ message: message })
-    });
-    if (response.ok) {
-      thunkAPI.dispatch(postsSlice.actions.addPost(message));
-    }
-  }
-);
 
 // Storeの作成
 let store;
