@@ -135,18 +135,8 @@ document.getElementById("counter-decrement").addEventListener("click", () => {
 
 document.getElementById("user-set").addEventListener("click", () => {
   const $userInput = document.getElementById("user-input");
-  fetch('http://localhost:3000/user', {
-    method: 'PUT',
-    headers: {
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify({ name: $userInput.value })
-  }).then(response => {
-    if (response.ok) {
-      store.dispatch(userSlice.actions.setUser($userInput.value));
+  store.dispatch(asyncSetUser($userInput.value));
       $userInput.value = '';
-    }
-  });
 });
 
 document.getElementById("post-add").addEventListener("click", () => {
