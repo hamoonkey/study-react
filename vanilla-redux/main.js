@@ -1,64 +1,61 @@
 /** Setup Store */
-import { combineReducers, legacy_createStore } from "https://cdn.jsdelivr.net/npm/redux@5.0.1/dist/redux.browser.mjs";
+import {createSlice, configureStore} from "https://cdn.jsdelivr.net/npm/@reduxjs/toolkit@2.9.2/+esm";
 
-// Reducer
-function counterReducer(state = { count: 0 }, action) {
-  switch (action.type) {
-    case 'INCREMENT':
-      return { count: state.count + 1 };
-    case 'DECREMENT':
-      return { count: state.count - 1 };
-    default:
-      return state;
+// Slice
+const counterSlice = createSlice({
+  name: 'counter',
+  initialState: { count: 0 },
+  reducers: {
+    increment: (state) => { 
+      state.count += 1;
+    },
+    decrement: (state) => { state.count -= 1 }
   }
-}
+});
 
-function userReducer(state = { name: '' }, action) {
-  switch (action.type) {
-    case 'SET_USER':
-        return { name: action.payload };
-    default:
-      return state;
+const userSlice = createSlice({
+  name: 'user',
+  initialState: { name: '' },
+  reducers: {
+    setUser: (state, action) => { state.name = action.payload }
   }
-}
+});
 
-function postsReducer(state = [], action) {
-  switch (action.type) {
-    case 'ADD_POST':
-      return [...state, action.payload];
-    default:
-      return state;
+const postsSlice = createSlice({
+  name: 'posts',
+  initialState: [],
+  reducers: {
+    addPost: (state, action) => { state.push(action.payload) }
   }
-}
-
-// combineReducersを使って統合
-const rootReducer = combineReducers({
-    counter: counterReducer,
-    user: userReducer,
-    posts: postsReducer
 });
 
 // Storeの作成
-const store = legacy_createStore(rootReducer, window.__REDUX_DEVTOOLS_EXTENSION__ && window.__REDUX_DEVTOOLS_EXTENSION__());
+const store = configureStore({
+  reducer: {
+    counter: counterSlice.reducer,
+    user: userSlice.reducer,
+    posts: postsSlice.reducer
+  }
+});
 
 /** User Operations */
 document.getElementById("counter-increment").addEventListener("click", () => {
-  store.dispatch({ type: 'INCREMENT' });
+  store.dispatch(counterSlice.actions.increment());
 });
 
 document.getElementById("counter-decrement").addEventListener("click", () => {
-  store.dispatch({ type: 'DECREMENT' });
+  store.dispatch(counterSlice.actions.decrement());
 });
 
 document.getElementById("user-set").addEventListener("click", () => {
   const $userInput = document.getElementById("user-input");
-  store.dispatch({ type: 'SET_USER', payload: $userInput.value });
+  store.dispatch(userSlice.actions.setUser($userInput.value));
   $userInput.value = '';
 });
 
 document.getElementById("post-add").addEventListener("click", () => {
   const $postInput = document.getElementById("post-input");
-  store.dispatch({ type: 'ADD_POST', payload: $postInput.value });
+  store.dispatch(postsSlice.actions.addPost($postInput.value));
   $postInput.value = '';
 });
 
