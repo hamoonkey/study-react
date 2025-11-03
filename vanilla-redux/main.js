@@ -1,5 +1,5 @@
 /** Setup Store */
-import {createSlice, configureStore} from "https://cdn.jsdelivr.net/npm/@reduxjs/toolkit@2.9.2/+esm";
+import {createSlice, configureStore, createAsyncThunk} from "https://cdn.jsdelivr.net/npm/@reduxjs/toolkit@2.9.2/+esm";
 
 // Slice and ThunkActionCreator
 const counterSlice = createSlice({
@@ -13,39 +13,39 @@ const counterSlice = createSlice({
   }
 });
 
-function asyncIncrement() {
-  return () => {
-    const newCounter = store.getState().counter.count + 1;
-    fetch('http://localhost:3000/count', {
+const asyncIncrement = createAsyncThunk(
+  'counter/asyncIncrement',
+  async (_, thunkAPI) => {
+    const newCounter = thunkAPI.getState().counter.count + 1;
+    const response = await fetch('http://localhost:3000/count', {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({ value: newCounter })
-    }).then(response => {
-      if (response.ok) {
-        store.dispatch(counterSlice.actions.increment());
-      }
     });
+    if (response.ok) {
+      thunkAPI.dispatch(counterSlice.actions.increment());
+    }
   }
-}
+);
 
-function asyncDecrement() {
-  return () => {
-    const newCounter = store.getState().counter.count - 1;
-    fetch('http://localhost:3000/count', {
+const asyncDecrement = createAsyncThunk(
+  'counter/asyncDecrement',
+  async (_, thunkAPI) => {
+    const newCounter = thunkAPI.getState().counter.count - 1;
+    const response = await fetch('http://localhost:3000/count', {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({ value: newCounter })
-    }).then(response => {
-      if (response.ok) {
-        store.dispatch(counterSlice.actions.decrement());
-      }
     });
+    if (response.ok) {
+      thunkAPI.dispatch(counterSlice.actions.decrement());
+    }
   }
-}
+);
 
 const userSlice = createSlice({
   name: 'user',
@@ -55,21 +55,21 @@ const userSlice = createSlice({
   }
 });
 
-function asyncSetUser(name) {
-  return () => {
-    fetch('http://localhost:3000/user', {
+const asyncSetUser = createAsyncThunk(
+  'user/asyncSetUser',  
+  async (name, thunkAPI) => {
+    const response = await fetch('http://localhost:3000/user', {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({ name: name })
-    }).then(response => {
-      if (response.ok) {
-        store.dispatch(userSlice.actions.setUser(name));
-      }
     });
+    if (response.ok) {
+      thunkAPI.dispatch(userSlice.actions.setUser(name));
+    }
   }
-}
+);
 
 const postsSlice = createSlice({
   name: 'posts',
@@ -79,21 +79,21 @@ const postsSlice = createSlice({
   }
 });
 
-function asyncAddPost(message) {
-  return () => {
-    fetch('http://localhost:3000/posts', {
+const asyncAddPost = createAsyncThunk(
+  'posts/asyncAddPost',
+  async (message, thunkAPI) => {
+    const response = await fetch('http://localhost:3000/posts', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({ message: message })
-    }).then(response => {
-      if (response.ok) {
-        store.dispatch(postsSlice.actions.addPost(message));
-      }
     });
+    if (response.ok) {
+      thunkAPI.dispatch(postsSlice.actions.addPost(message));
+    }
   }
-}
+);
 
 // Storeの作成
 let store;
@@ -136,7 +136,7 @@ document.getElementById("counter-decrement").addEventListener("click", () => {
 document.getElementById("user-set").addEventListener("click", () => {
   const $userInput = document.getElementById("user-input");
   store.dispatch(asyncSetUser($userInput.value));
-      $userInput.value = '';
+  $userInput.value = '';
 });
 
 document.getElementById("post-add").addEventListener("click", () => {
