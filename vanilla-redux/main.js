@@ -38,7 +38,7 @@ const asyncDecrement = createAsyncThunk(
 
 const counterSlice = createSlice({
   name: 'counter',
-  initialState: { count: 0 },
+  initialState: { status: 'idle', count: 0 },
   reducers: {
     increment: (state) => { 
       state.count += 1;
@@ -46,9 +46,27 @@ const counterSlice = createSlice({
     decrement: (state) => { state.count -= 1 }
   },
   extraReducers: (builder) => {
-    builder.addCase(asyncIncrement.fulfilled, (state, action) => {
-      state.count += 1;
-    });
+    builder
+      .addCase(asyncIncrement.pending, (state) => {
+        state.status = 'loading';
+      })
+      .addCase(asyncIncrement.fulfilled, (state) => {
+        state.status = 'succeeded';
+        state.count += 1;
+      })
+      .addCase(asyncIncrement.rejected, (state) => {
+        state.status = 'failed';
+      })
+      .addCase(asyncDecrement.pending, (state) => {
+        state.status = 'loading';
+      })
+      .addCase(asyncDecrement.fulfilled, (state) => {
+        state.status = 'succeeded';
+        state.count -= 1;
+      })
+      .addCase(asyncDecrement.rejected, (state) => {
+        state.status = 'failed';
+      });
   }
 });
 
@@ -70,14 +88,22 @@ const asyncSetUser = createAsyncThunk(
 
 const userSlice = createSlice({
   name: 'user',
-  initialState: { name: '' },
+  initialState: { status: 'idle', name: '' },
   reducers: {
     setUser: (state, action) => { state.name = action.payload }
   },
   extraReducers: (builder) => {
-    builder.addCase(asyncSetUser.fulfilled, (state, action) => {
-      state.name = action.payload;
-    });
+    builder
+      .addCase(asyncSetUser.pending, (state) => {
+        state.status = 'loading';
+      })
+      .addCase(asyncSetUser.fulfilled, (state, action) => {
+        state.status = 'succeeded';
+        state.name = action.payload;
+      })
+      .addCase(asyncSetUser.rejected, (state) => {
+        state.status = 'failed';
+      });
   }
 });
 
@@ -99,14 +125,22 @@ const asyncAddPost = createAsyncThunk(
 
 const postsSlice = createSlice({
   name: 'posts',
-  initialState: [],
+  initialState: { status: 'idle', messages: [] },
   reducers: {
-    addPost: (state, action) => { state.push(action.payload) }
+    addPost: (state, action) => { state.messages.push(action.payload) }
   },
   extraReducers: (builder) => {
-    builder.addCase(asyncAddPost.fulfilled, (state, action) => {
-      state.push(action.payload);
-    });
+    builder
+      .addCase(asyncAddPost.pending, (state) => {
+        state.status = 'loading';
+      })
+      .addCase(asyncAddPost.fulfilled, (state, action) => {
+        state.status = 'succeeded';
+        state.messages.push(action.payload);
+      })
+      .addCase(asyncAddPost.rejected, (state) => {
+        state.status = 'failed';
+      });
   }
 });
 
@@ -124,9 +158,9 @@ Promise.all(initialState).then(responses => Promise.all(responses.map(res => res
       posts: postsSlice.reducer
     },
     preloadedState: {
-      counter: {count: count.value},
-      user: { name: user.name },
-      posts: posts.map(post => post.message)
+      counter: { status: 'idle', count: count.value },
+      user: { status: 'idle', name: user.name },
+      posts: { status: 'idle', messages: posts.map(post => post.message) }
     }
   });
 
@@ -170,13 +204,19 @@ function updateView_User(user) {
 }
 
 function updateView_Posts(posts) {
-  const postList = document.getElementById('post-list');
-  postList.innerHTML = '';
-  posts.forEach(post => {
-    const li = document.createElement('li');
-    li.textContent = post;
-    postList.appendChild(li);
+  const $postList = document.getElementById('post-list');
+  $postList.innerHTML = '';
+  posts.messages.forEach(message => {
+    const $li = document.createElement('li');
+    $li.textContent = message;
+    $postList.appendChild($li);
   });
+}
+
+function toggleLoading(states) {
+  // stateのうちいずれかがloadingならばマウスカーソルを待機状態にする
+  const isLoading = states.some(state => state.status === 'loading');
+  Array.from(document.getElementsByTagName("button")).forEach($button => $button.style.cursor = isLoading ? 'wait' : 'default');
 }
 
 function updateView() {
@@ -184,4 +224,5 @@ function updateView() {
   updateView_Counter(state.counter);
   updateView_User(state.user);
   updateView_Posts(state.posts);
+  toggleLoading([state.counter, state.user, state.posts]);
 }
