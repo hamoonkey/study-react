@@ -30,12 +30,32 @@ const postsSlice = createSlice({
 });
 
 // Storeの作成
-const store = configureStore({
-  reducer: {
-    counter: counterSlice.reducer,
-    user: userSlice.reducer,
-    posts: postsSlice.reducer
-  }
+let store;
+const initialState = [];
+initialState.push(fetch('http://localhost:3000/count'));
+initialState.push(fetch('http://localhost:3000/user'));
+initialState.push(fetch('http://localhost:3000/posts'));
+Promise.all(initialState).then(responses => Promise.all(responses.map(res => res.json()))).then(([count, user, posts]) => {
+  store = configureStore({
+    reducer: {
+      counter: counterSlice.reducer,
+      user: userSlice.reducer,
+      posts: postsSlice.reducer
+    },
+    preloadedState: {
+      counter: {count: count.value},
+      user: { name: user.name },
+      posts: posts.map(post => post.message)
+    }
+  });
+
+  updateView();
+
+  // 状態の監視
+  store.subscribe(() => {
+    console.log('現在の状態:', store.getState());
+    updateView();
+  });
 });
 
 /** User Operations */
@@ -126,11 +146,3 @@ function updateView() {
   updateView_User(state.user);
   updateView_Posts(state.posts);
 }
-
-updateView();
-
-// 状態の監視
-store.subscribe(() => {
-  console.log('現在の状態:', store.getState());
-  updateView();
-});
