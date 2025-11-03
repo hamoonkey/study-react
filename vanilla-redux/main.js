@@ -1,21 +1,18 @@
 /** Setup Store */
-import { combineReducers, legacy_createStore, applyMiddleware } from "https://cdn.jsdelivr.net/npm/redux@5.0.1/dist/redux.browser.mjs";
-import { thunk } from "https://cdnjs.cloudflare.com/ajax/libs/redux-thunk/3.1.0/redux-thunk.legacy-esm.min.js";
+import {createSlice, configureStore} from "https://cdn.jsdelivr.net/npm/@reduxjs/toolkit@2.9.2/+esm";
 
-// Reducer and Action Creator
-function counterReducer(state = { count: 0 }, action) {
-  switch (action.type) {
-    case 'INCREMENT':
-      return { count: state.count + 1 };
-    case 'DECREMENT':
-      return { count: state.count - 1 };
-    default:
-      return state;
+// Slice and ThunkActionCreator
+const counterSlice = createSlice({
+  name: 'counter',
+  initialState: { count: 0 },
+  reducers: {
+    increment: (state) => { 
+      state.count += 1;
+    },
+    decrement: (state) => { state.count -= 1 }
   }
-}
-function increment() {
-  return { type: 'INCREMENT' };
-}
+});
+
 function asyncIncrement() {
   return () => {
     const newCounter = store.getState().counter.count + 1;
@@ -27,14 +24,12 @@ function asyncIncrement() {
       body: JSON.stringify({ value: newCounter })
     }).then(response => {
       if (response.ok) {
-        store.dispatch(increment());
+        store.dispatch(counterSlice.actions.increment());
       }
     });
   }
 }
-function decrement() {
-  return { type: 'DECREMENT' };
-}
+
 function asyncDecrement() {
   return () => {
     const newCounter = store.getState().counter.count - 1;
@@ -46,23 +41,20 @@ function asyncDecrement() {
       body: JSON.stringify({ value: newCounter })
     }).then(response => {
       if (response.ok) {
-        store.dispatch(decrement());
+        store.dispatch(counterSlice.actions.decrement());
       }
     });
   }
 }
 
-function userReducer(state = { name: '' }, action) {
-  switch (action.type) {
-    case 'SET_USER':
-        return { name: action.payload };
-    default:
-      return state;
+const userSlice = createSlice({
+  name: 'user',
+  initialState: { name: '' },
+  reducers: {
+    setUser: (state, action) => { state.name = action.payload }
   }
-}
-function setUser(name) {
-  return { type: 'SET_USER', payload: name };
-}
+});
+
 function asyncSetUser(name) {
   return () => {
     fetch('http://localhost:3000/user', {
@@ -73,23 +65,20 @@ function asyncSetUser(name) {
       body: JSON.stringify({ name: name })
     }).then(response => {
       if (response.ok) {
-        store.dispatch(setUser(name));
+        store.dispatch(userSlice.actions.setUser(name));
       }
     });
   }
 }
 
-function postsReducer(state = [], action) {
-  switch (action.type) {
-    case 'ADD_POST':
-      return [...state, action.payload];
-    default:
-      return state;
+const postsSlice = createSlice({
+  name: 'posts',
+  initialState: [],
+  reducers: {
+    addPost: (state, action) => { state.push(action.payload) }
   }
-}
-function addPost(message) {
-  return { type: 'ADD_POST', payload: message };
-}
+});
+
 function asyncAddPost(message) {
   return () => {
     fetch('http://localhost:3000/posts', {
@@ -100,18 +89,11 @@ function asyncAddPost(message) {
       body: JSON.stringify({ message: message })
     }).then(response => {
       if (response.ok) {
-        store.dispatch(addPost(message));
+        store.dispatch(postsSlice.actions.addPost(message));
       }
     });
   }
 }
-
-// combineReducersを使って統合
-const rootReducer = combineReducers({
-    counter: counterReducer,
-    user: userReducer,
-    posts: postsReducer
-});
 
 // Storeの作成
 let store;
@@ -120,11 +102,18 @@ initialState.push(fetch('http://localhost:3000/count'));
 initialState.push(fetch('http://localhost:3000/user'));
 initialState.push(fetch('http://localhost:3000/posts'));
 Promise.all(initialState).then(responses => Promise.all(responses.map(res => res.json()))).then(([count, user, posts]) => {
-  store = legacy_createStore(rootReducer, {
-    counter: {count: count.value},
-    user: { name: user.name },
-    posts: posts.map(post => post.message)
-  }, applyMiddleware(thunk));
+  store = configureStore({
+    reducer: {
+      counter: counterSlice.reducer,
+      user: userSlice.reducer,
+      posts: postsSlice.reducer
+    },
+    preloadedState: {
+      counter: {count: count.value},
+      user: { name: user.name },
+      posts: posts.map(post => post.message)
+    }
+  });
 
   updateView();
 
@@ -146,8 +135,18 @@ document.getElementById("counter-decrement").addEventListener("click", () => {
 
 document.getElementById("user-set").addEventListener("click", () => {
   const $userInput = document.getElementById("user-input");
-  store.dispatch(asyncSetUser($userInput.value));
-  $userInput.value = '';
+  fetch('http://localhost:3000/user', {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({ name: $userInput.value })
+  }).then(response => {
+    if (response.ok) {
+      store.dispatch(userSlice.actions.setUser($userInput.value));
+      $userInput.value = '';
+    }
+  });
 });
 
 document.getElementById("post-add").addEventListener("click", () => {
